@@ -514,21 +514,20 @@ module.exports = function(options){
     if(typeof onprogress === 'function') ft.onprogress = onprogress;
     var promise = new Promise(function(resolve,reject){
       var attempt = function(err){
-        if(transferOptions.retry.length === 0) {
+        if(transferOptions.retry.length === 0 || (err && err.code === 4)) {
           if(options.debug) console.log('FileTransfer Error: '+serverUrl,err);
           reject(err);
         } else {
-
-    		  var transferJob = {
-    		    fileTransfer:ft,
-    		    isDownload:isDownload,
-    		    serverUrl:serverUrl,
-    		    localPath:localPath,
-    		    trustAllHosts:transferOptions.trustAllHosts || false,
-    		    transferOptions:transferOptions,
-    		    win:resolve,
-    		    fail:attempt
-    		  };
+          var transferJob = {
+            fileTransfer:ft,
+            isDownload:isDownload,
+            serverUrl:serverUrl,
+            localPath:localPath,
+            trustAllHosts:transferOptions.trustAllHosts || false,
+            transferOptions:transferOptions,
+            win:resolve,
+            fail:attempt
+          };
           transferQueue.unshift(transferJob);
           var timeout = transferOptions.retry.shift();
           if(timeout > 0) {
